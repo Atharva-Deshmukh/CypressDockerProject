@@ -1,0 +1,12 @@
+{
+  "name": "CypressDocker",
+  "version": "1.0.0",
+  "description": "Cypress Tests In Docker",
+  "main": "index.js",
+  "author": "Atharva Deshmukh",
+  "license": "MIT",
+  "devDependencies": {
+    "cypress": "^15.8.1",
+    "typescript": "^5.9.3"
+  }
+}
