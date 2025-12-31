@@ -1,1 +1,5 @@
 Make readme to illustrate step by step cypress docker configuration
+
+
+
+Entrypoint vs CMD
