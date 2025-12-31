@@ -57,6 +57,8 @@ COPY . .
 
 Folder structure inside container:
 
+```
+text
 /myApp
 ├── cypress/
 │   └── e2e/
@@ -70,6 +72,8 @@ Folder structure inside container:
 ├── package-lock.json
 ├── tsconfig.json
 └── cypress.config.ts     # (if/when you add it)
+
+```
 
 After Creating dockerfile, we may delete the cypress we installed in our local machine
 Command: 
