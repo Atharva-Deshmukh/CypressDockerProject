@@ -58,7 +58,6 @@ COPY . .
 Folder structure inside container:
 
 ```
-text
 /myApp
 ├── cypress/
 │   └── e2e/
