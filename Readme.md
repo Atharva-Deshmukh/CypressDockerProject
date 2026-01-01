@@ -5,10 +5,9 @@
 - Without Docker, directly on the github runners inside an ubuntu machine
 - With docker, docker container inside github runners 
 
+---
 
 ## Running Cypress API Tests in Docker container in host machine
-
----
 
 ### 1. Local Setup and Test Validation
 
@@ -222,3 +221,7 @@ npm run smoke
 
 Prevents accidental bypassing of automation
 Safer for CI and production pipelines
+
+---
+
+## Running Cypress API Tests in Github Actions (Without Docker)
