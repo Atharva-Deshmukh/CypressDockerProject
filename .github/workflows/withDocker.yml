@@ -1,0 +1,29 @@
+name: Cypress API Tests - DOCKERFILE
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+
+jobs:
+  cypress-docker:
+    runs-on: ubuntu-latest
+    environment: CI CD Env
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t cypress-api-tests .
+
+      - name: Run specific Cypress spec in container
+        run: |
+          docker run --rm \
+            -e CYPRESS_API_BASE_URL=${{ vars.CYPRESS_API_BASE_URL }} \
+            -e CYPRESS_REPO_VARIABLE=${{ vars.REPO_VARIABLE }} \
+            cypress-api-tests \
+            npx cypress run --spec "cypress/e2e/api-int-secretPassed/*.cy.{js,ts}"
+
+# Everything after the image name overrides the default command.
+# since this is cypress/included container, it runs by default on cypress run command, and this runs all the specs
