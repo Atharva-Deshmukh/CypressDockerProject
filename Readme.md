@@ -402,7 +402,12 @@ Here, I have just added base URL, which was hardcoded earlier in github secrets.
 
 ## Where to Add Github Secrets?
 
-GitHub Repo → Settings Tab → Secrets → Actions -> Variables -> Create new variable there
+GitHub Repo → Settings Tab → Secrets → Actions -> Variables -> Create new env variable there
+
+```
+Secrets --> They are encrypted and not shown like password, client secret
+Variables --> They are shown since they are non-sensitive like base URL
+```
 
 I added:
 ```
