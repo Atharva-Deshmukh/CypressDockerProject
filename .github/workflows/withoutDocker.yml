@@ -70,6 +70,7 @@ jobs:
 
       # Run only specs inside api-int-1 directory
       # if not specified, all specs in all directories are executed
+      # by default, jobs are run in parallel, so api-int-1 and api-int-2 will run in parallel
       - name: Run Cypress tests (api-int-1)
         run: npx cypress run --spec "cypress/e2e/api-int-1/*.cy.{js,ts}"
 
