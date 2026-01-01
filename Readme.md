@@ -405,6 +405,12 @@ Here, I have just added base URL, which was hardcoded earlier in github secrets.
 GitHub Repo → Settings Tab → Secrets → Actions -> Variables -> Create new env variable there.
 This separates environment concerns
 
+Add this in yaml
+```
+    # Targeting the correct environment on github actions is necessary
+    environment: CI CD Env
+```
+
 ```
 Secrets --> They are encrypted and not shown like password, client secret
 Variables --> They are shown since they are non-sensitive like base URL
