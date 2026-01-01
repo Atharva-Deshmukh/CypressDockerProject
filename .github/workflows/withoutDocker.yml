@@ -1,45 +1,97 @@
-# Name of the workflow (shown in GitHub Actions UI)
+# Name of the GitHub Actions workflow
 name: Cypress API Tests - WITHOUT DOCKER
 
-# Defines when this workflow should run, events basically
+# Events that trigger this workflow, here, push event on master branch triggers pipeline
 on:
   push:
     branches: [ master ]
 
+  # kept empty
   pull_request:
 
-# A workflow is made of one or more jobs
 jobs:
-  # Name of the job
-  Run-Tests:
-
-    # The type of machine (runner) GitHub will use
-    # ubuntu-latest = Linux machine managed by GitHub
+  # -------------------
+  # BUILD JOB
+  # -------------------
+  build-job:
     runs-on: ubuntu-latest
 
-    # Steps are the small tasks that make up the job
     steps:
-      # Step 1: Download (checkout) your repository code
+      # Checkout the repository code
       - name: Checkout repo
-        # Uses a pre-built GitHub Action to get your code
         uses: actions/checkout@v4
 
-      # Step 2: Install Node.js on the runner
+      # Set up Node.js environment
       - name: Setup Node.js
-        # Uses an official action to install Node
-        # install cypress in local since this action only installs Node.js and npm (package manager)
         uses: actions/setup-node@v4
         with:
-          # Version of Node.js to install
           node-version: 20
 
-      # Step 3: Install project dependencies
+      # Install dependencies
       - name: Install dependencies
-        # npm ci installs dependencies using package-lock.json
-        # It is faster and more reliable for CI
         run: npm ci
 
-      # Step 4: Run Cypress tests
-      - name: Run Cypress tests
-        # Runs Cypress in headless mode from the command line
-        run: npx cypress run
+      # Upload node_modules for reuse in parallel test jobs
+      # these are the artifacts that will be used by subsequent jobs
+      - name: Upload node_modules
+        uses: actions/upload-artifact@v4
+        with:
+          name: node-modules
+          path: node_modules
+
+  # -------------------
+  # TEST JOB – api-int-1
+  # -------------------
+  api-int-1:
+    runs-on: ubuntu-latest
+
+    # Runs only after build-job succeeds
+    needs: build-job
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+        # reuse the aritfacts generated in build job
+      - name: Download node_modules
+        uses: actions/download-artifact@v4
+        with:
+          name: node-modules
+          path: node_modules
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # Run only specs inside api-int-1 directory
+      - name: Run Cypress tests (api-int-1)
+        run: npx cypress run --spec "cypress/e2e/api-int-1/**/*.cy.{js,ts}"
+
+  # -------------------
+  # TEST JOB – api-int-2
+  # -------------------
+  api-int-2:
+    runs-on: ubuntu-latest
+
+    # Runs only after build-job succeeds
+    needs: build-job
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Download node_modules
+        uses: actions/download-artifact@v4
+        with:
+          name: node-modules
+          path: node_modules
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # Run only specs inside api-int-2 directory
+      - name: Run Cypress tests (api-int-2)
+        run: npx cypress run --spec "cypress/e2e/api-int-2/**/*.cy.{js,ts}"
