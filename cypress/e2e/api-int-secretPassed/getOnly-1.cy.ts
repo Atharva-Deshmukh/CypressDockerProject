@@ -6,4 +6,8 @@ describe('GET API', () => {
         expect(response.body).to.have.length(10);
       });
   });
+
+  it('Repository Variable', () => {
+      expect(Cypress.env('REPO_VARIABLE')).to.eq(31);
+  });
 });
