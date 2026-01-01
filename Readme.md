@@ -400,6 +400,8 @@ This makes tests run of different environments with different credentials
 
 Here, I have just added base URL, which was hardcoded earlier in github secrets.
 
+REFER: .github\workflows\withoutDockerWithSecretPassed.yml
+
 ## Where to Add Github Secrets?
 
 GitHub Repo → Settings Tab → Secrets → Actions -> Variables -> Create new env variable there.
@@ -432,7 +434,7 @@ Changes made in yaml file to map this env variable
       - name: Run Cypress tests (api-int-secretPassed)
         run: npx cypress run --spec "cypress/e2e/api-int-secretPassed/*.cy.{js,ts}"
         env:
-          CYPRESS_API_BASE_URL: ${{ secrets.API_BASE_URL }}
+          CYPRESS_API_BASE_URL: ${{ vars.CYPRESS_API_BASE_URL }}
 ```
 
 npx cypress run works in CI without prefixing the variable, so this works
@@ -440,7 +442,7 @@ npx cypress run works in CI without prefixing the variable, so this works
 ```
         run: npx cypress run --spec "cypress/e2e/api-int-secretPassed/*.cy.{js,ts}"
         env:
-          CYPRESS_API_BASE_URL: ${{ secrets.API_BASE_URL }}
+          CYPRESS_API_BASE_URL: ${{ vars.CYPRESS_API_BASE_URL }}
 ```
 
 Locally you do this:
