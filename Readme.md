@@ -1,27 +1,28 @@
-# Cypress API Tests in Docker
+# This Small Project Covers Running Cypress Test Scripts on:
 
-This project demonstrates how to:
-- Install Cypress locally
-- Write a basic API test
-- Run tests locally
-- Run the same tests inside a Docker container
-- Remove local Cypress and rely entirely on Docker
+1. A docker container locally (without cypress installed on the host machine)
+2. CI/CD (Github Actions):
+- Without Docker, directly on the github runners inside an ubuntu machine
+- With docker, docker container inside github runners 
+
+
+## Running Cypress API Tests in Docker container in host machine
 
 ---
 
-## 1. Local Setup and Test Validation
+### 1. Local Setup and Test Validation
 
 Before using Docker, it is important to verify that your Cypress tests work locally.
 
-### Steps
+#### Steps
 1. Install Cypress locally
 2. Write a basic API test
 3. Run the test locally to ensure it passes
 
-### Important
+#### Important
 To run `npm ci` inside a Docker container, a `package-lock.json` file **must exist**.
 
-### Generate `package-lock.json`
+#### Generate `package-lock.json`
 
 powershell
 ```
@@ -108,13 +109,13 @@ docker run -rm cypress-docker
 
 And the tests are now run inside container with cypress installed, we don't have cypress setup locally.
 
-# SOME IMPORTANT POINTS:
+## SOME IMPORTANT POINTS:
 
-## 1. npm install vs npm ci
+### 1. npm install vs npm ci
 
 package.json defines allowed versions, but package-lock.json defines installed versions — and npm ci trusts only the lockfile.
 
-### npm install
+#### npm install
 
 npm install installs dependencies based on package.json and may use package-lock.json.
 If version ranges allow it, npm can resolve newer compatible versions and update the lockfile.
@@ -123,7 +124,7 @@ If version ranges allow it, npm can resolve newer compatible versions and update
 - Slower compared to npm ci
 - Suitable for local development, not ideal for CI
 
-### What happens with npm install
+#### What happens with npm install
 
 1. npm reads package.json
 2. Sees ^18.3.1
@@ -136,11 +137,11 @@ If version ranges allow it, npm can resolve newer compatible versions and update
 ```
 This is where flakiness comes from.
 
-### Risks while testing:
+#### Risks while testing:
 
 Two CI runs can install slightly different dependency trees → tests pass in one run and fail in another.
 
-### npm ci
+#### npm ci
 
 npm ci is designed for continuous integration. It installs dependencies exactly as specified in package-lock.json, ensuring reproducible and deterministic builds.
 
@@ -150,7 +151,7 @@ npm ci is designed for continuous integration. It installs dependencies exactly 
 - Faster and more reliable
 - Guarantees consistent test environments
 
-### What happens with npm ci
+#### What happens with npm ci
 
 - npm ignores version ranges in package.json
 - Reads exact versions from package-lock.json and Installs exactly those versions
@@ -167,15 +168,15 @@ Example lockfile entry:
 
 npm ci will always install 18.3.2, even if 18.3.5 exists and package.json allows it (^18.3.1)
 
-## 2. Entrypoint vs CMD
+### 2. Entrypoint vs CMD
 
-### High-level difference
+#### High-level difference
 
 - ENTRYPOINT defines what the container is,
 - CMD defines what the container does by default.
 
 
-### CMD
+#### CMD
 
 
 Provides default arguments or a default command
@@ -193,11 +194,11 @@ docker run my-image npm run smoke
 
 ➡️ CMD is replaced.
 
-### Risk in CI
+#### Risk in CI
 
 Someone can override CMD and accidentally skip tests.
 
-### ENTRYPOINT
+#### ENTRYPOINT
 
 Defines the fixed executable that always runs
 Cannot be overridden accidentally (unless explicitly forced)
