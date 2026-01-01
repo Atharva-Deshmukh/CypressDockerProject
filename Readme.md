@@ -390,6 +390,58 @@ npm ci:
 ➡️ No network downloads
 ➡️ Only filesystem work
 
+---
+
+# Secrets management
+
+Instead of hardcoding base URLs, passwords, we store those variables in github secrets and then
+access them from there.
+This makes tests run of different environments with different credentials
+
+Here, I have just added base URL, which was hardcoded earlier in github secrets.
+
+## Where to Add Github Secrets?
+
+GitHub Repo → Settings Tab → Secrets → Actions -> Variables -> Create new variable there
+
+I added:
+```
+API_BASE_URL = https://jsonplaceholder.typicode.com
+```
+
+Changes made in yaml file to map this env variable
+
+```
+      # Install dependencies (fast due to cache)
+      - name: Install dependencies
+        run: npm ci
+
+      # Run Cypress tests for api-int-secretPassed - Secret is passed in env, we just map here
+      - name: Run Cypress tests (api-int-secretPassed)
+        run: npx cypress run --spec "cypress/e2e/api-int-secretPassed/*.cy.{js,ts}"
+        env:
+          CYPRESS_API_BASE_URL: ${{ secrets.API_BASE_URL }}
+```
+
+npx cypress run works in CI without prefixing the variable, so this works
+
+```
+        run: npx cypress run --spec "cypress/e2e/api-int-secretPassed/*.cy.{js,ts}"
+        env:
+          CYPRESS_API_BASE_URL: ${{ secrets.API_BASE_URL }}
+```
+
+Locally you do this:
+```
+CYPRESS_API_BASE_URL=https://jsonplaceholder.typicode.com npx cypress run
+```
+
+Because you must inject the environment variable yourself in your local shell.
+
+## NOTE:
+
+when we have more than one yml file, each of which represent a separate workflow, each yml file 
+is triggered if it meets condition in 'On' and 'Branches'
 
 
 
