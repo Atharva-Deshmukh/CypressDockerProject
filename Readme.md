@@ -516,5 +516,14 @@ vars = { REPO_VARS + QA_ENV_VARS }
 when we have more than one yml file, each of which represent a separate workflow, each yml file 
 is triggered if it meets condition in 'On' and 'Branches'
 
+# Running Cypress API Tests in Docker container in CI/CD
 
+## Why Docker containers in CI/CD?
 
+- Docker shines when “works on my machine” is unacceptable.
+- Same OS locally + CI
+- Same Cypress + browser versions
+- Corporate proxy
+
+Just a yaml file change needed.
+REFER -> .github\workflows\withDocker.yml
