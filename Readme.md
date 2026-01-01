@@ -224,4 +224,67 @@ Safer for CI and production pipelines
 
 ---
 
+# Little Theory --> Components of Github actions
+
+### Workflow 👉 The whole plan
+
+- A workflow is a set of steps that run automatically.
+- It is written in a YAML file and stored in .github/workflows/.
+- Think of it as a recipe.
+
+### Event 👉 The trigger
+
+- An event tells GitHub when to run the workflow.
+- Pushing code (push), Creating a pull request (pull_request), Clicking a button manually (workflow_dispatch)
+
+### Job 👉 A big task
+
+A workflow contains one or more jobs. Each job does something important, 
+like:
+- Run tests
+- Build the app
+- Deploy the app
+Jobs usually run in parallel.
+Think of a job as a worker doing a task.
+
+### Runner 👉 The machine that does the work
+
+- A runner is the computer that runs the job.
+- GitHub provides runners like: Ubuntu, Windows, macOS
+
+Think of it as the computer that follows the instructions.
+
+### Step 👉 Small actions inside a job
+
+- A job is made of steps.
+
+- Each step does one small thing:
+1. Checkout code
+2. Install dependencies
+3. Run a command
+
+Think of steps as instructions in the recipe.
+
+### YAML File 👉 Where everything is written
+
+- Workflows are written in YAML.
+- It describes: When to run, What jobs to run, What steps to follow
+
+
+Simple Mental Picture
+```
+Event happens
+   ↓
+Workflow starts
+   ↓
+Jobs run
+   ↓
+Steps execute
+   ↓
+Actions help
+   ↓
+Runner does the work
+```
+---
+
 ## Running Cypress API Tests in Github Actions (Without Docker)
