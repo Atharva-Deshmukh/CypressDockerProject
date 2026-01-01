@@ -452,6 +452,65 @@ CYPRESS_API_BASE_URL=https://jsonplaceholder.typicode.com npx cypress run
 
 Because you must inject the environment variable yourself in your local shell.
 
+There are two kinds of variables we can set in github:
+
+Environment  
+- Secret
+- Variable
+
+Repository
+- Secret
+- Variable
+
+## Internal Working of Repository and Environment Variables
+
+both Repository and Environment variables were mapped in yaml file, then what is the difference
+
+```
+env:
+  CYPRESS_API_BASE_URL: ${{ vars.CYPRESS_API_BASE_URL }}
+  CYPRESS_REPO_VARIABLE: ${{ vars.REPO_VARIABLE }}
+```
+
+Refer -> YAML SCREENSHOTS\VARIABLES.png
+
+GitHub Actions has two layers:
+
+1️⃣ Variable storage layer (UI / configuration)
+- Repository variables
+- Environment variables
+
+2️⃣ Variable resolution layer (job runtime)
+
+- Only variables that are in scope appear
+- All in-scope variables are merged into vars
+
+Inside the workflow, you only see the merged result. The workflow does not know where the variable came from
+Only GitHub knows
+
+Case A: Repository variables
+
+Always in scope (Global Scope):
+```
+vars = { REPO_VAR_1, REPO_VAR_2, ... }
+```
+Case B: Environment variables
+
+Only in scope if the job declares the environment:
+```
+jobs:
+  test:
+    environment: qa  --> say if this is our env
+```
+
+Then:
+```
+vars = { REPO_VARS + QA_ENV_VARS }
+```
+
+
+### If names clash Environment variable wins
+
 ## NOTE:
 
 when we have more than one yml file, each of which represent a separate workflow, each yml file 
