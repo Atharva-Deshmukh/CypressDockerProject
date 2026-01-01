@@ -64,6 +64,10 @@ jobs:
         with:
           node-version: 20
 
+      # Ensure binaries are linked
+      - name: Reinstall dependencies (link binaries)
+        run: npm ci
+
       # Run only specs inside api-int-1 directory
       - name: Run Cypress tests (api-int-1)
         run: npx cypress run --spec "cypress/e2e/api-int-1/*.cy.{js,ts}"
@@ -91,6 +95,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+
+      # Ensure binaries are linked
+      - name: Reinstall dependencies (link binaries)
+        run: npm ci
 
       # Run only specs inside api-int-2 directory
       - name: Run Cypress tests (api-int-2)
