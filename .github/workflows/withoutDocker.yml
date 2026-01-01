@@ -1,0 +1,44 @@
+# Name of the workflow (shown in GitHub Actions UI)
+name: Cypress API Tests - WITHOUT DOCKER
+
+# Defines when this workflow should run, events basically
+on:
+  push:
+    branches: [ master ]
+
+  pull_request:
+
+# A workflow is made of one or more jobs
+jobs:
+  # Name of the job
+  Run-Tests:
+
+    # The type of machine (runner) GitHub will use
+    # ubuntu-latest = Linux machine managed by GitHub
+    runs-on: ubuntu-latest
+
+    # Steps are the small tasks that make up the job
+    steps:
+      # Step 1: Download (checkout) your repository code
+      - name: Checkout repo
+        # Uses a pre-built GitHub Action to get your code
+        uses: actions/checkout@v4
+
+      # Step 2: Install Node.js on the runner
+      - name: Setup Node.js
+        # Uses an official action to install Node
+        uses: actions/setup-node@v4
+        with:
+          # Version of Node.js to install
+          node-version: 20
+
+      # Step 3: Install project dependencies
+      - name: Install dependencies
+        # npm ci installs dependencies using package-lock.json
+        # It is faster and more reliable for CI
+        run: npm ci
+
+      # Step 4: Run Cypress tests
+      - name: Run Cypress tests
+        # Runs Cypress in headless mode from the command line
+        run: npx cypress run
