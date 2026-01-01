@@ -288,3 +288,108 @@ Runner does the work
 ---
 
 ## Running Cypress API Tests in Github Actions (Without Docker)
+
+We will create a yaml file first in the location ROOT -> .github/workflows/file.yml:
+
+Refer this in Repo
+```
+.github\workflows\withoutDocker.yml
+```
+
+Refer these Screenshots
+```
+YAML SCREENSHOTS
+```
+In yaml file, we can see prewritten actions like actions/checkout@v4
+
+I have created 3 jobs:
+- build job that creates node modules
+- two parallely executing jobs that runs int-1 and int-2 specs separately
+
+Each GitHub Actions job runs on a fresh, separate VM.
+
+That means:
+- build-job runs on Machine A
+- api-int-1 runs on Machine B
+- api-int-2 runs on Machine C
+
+Nothing (files, node_modules, caches) is shared automatically between them.
+I used cache to share node_modules between jobs
+
+GitHub cache works like this:
+```
+
+Cache Storage (GitHub)
+       ↑     ↓
+build-job  api-int-1  api-int-2
+
+GitHub caches are stored on GitHub’s infrastructure, not inside your repo and not permanently on the runner.
+```
+
+## In each job I created, this happens:
+
+```
+VM starts empty
+npm cache is restored (if available)
+npm ci creates a new node_modules folder
+Tests/build run
+VM is destroyed
+
+node_modules is built separately in each job.
+```
+
+```
+## What Is Reused vs Rebuilt
+
+| Thing                 | Reused? | How                          |
+|-----------------------|---------|------------------------------|
+| npm package downloads | ✅ Yes  | GitHub cache (`~/.npm`)      |
+| Cypress binary        | ✅ Yes  | npm cache                    |
+| node_modules folder   | ❌ No   | Rebuilt every job            |
+| Compiled JS / TS      | ❌ No   | Job-local                    |
+| OS filesystem         | ❌ No   | New VM                       |
+
+```
+
+Even though node_modules is rebuilt, npm does not download packages again
+
+It just:
+
+- Copies from cache
+- Extracts tarballs
+- Links binaries
+
+That’s why cached installs are usually seconds, not minutes.
+
+## What I avoided
+
+❌ Share node_modules via artifacts
+❌ Skip npm ci in test jobs
+❌ Assume jobs share filesystems
+
+Those approaches cause:
+
+- Flaky builds
+- OS / path issues
+- Cypress binary mismatches
+
+## My Subsequent Runs workflow
+
+Subsequent runs / parallel jobs (warm cache)
+
+In every job Cache is restored (~/.npm)
+
+npm ci:
+
+- Does NOT download packages
+- Does NOT download Cypress again
+- Extracts packages from cache
+- Recreates node_modules
+- Links binaries (node_modules/.bin)
+
+➡️ No network downloads
+➡️ Only filesystem work
+
+
+
+
