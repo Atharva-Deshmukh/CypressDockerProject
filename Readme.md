@@ -22,7 +22,9 @@ Before using Docker, it is important to verify that your Cypress tests work loca
 To run `npm ci` inside a Docker container, a `package-lock.json` file **must exist**.
 
 ### Generate `package-lock.json`
-```powershell
+
+powershell
+```
 npm install
 ```
 
@@ -40,8 +42,8 @@ DECISION of image
 | cypress/factory    | ❌ No (advanced)         | Used to build custom images                      |
 
 
-```
 Docker File
+```
 
 FROM cypress/included:15.8.1
 
@@ -75,38 +77,38 @@ Folder structure inside container:
 ```
 
 After Creating dockerfile, we may delete the cypress we installed in our local machine
-Command: 
-```
+
+Command:
+
 powershell
+```
 yarn remove cypress
 ```
 
-Verify removal: 
+Verify removal:
 
+powershell 
 ```
-powershell
 yarn cypress --version
 ```
 
 Now, Build an image from our app. Image tag used: cypress-docker
 
-```
 powershell
+```
 docker build -t cypress-docker .
 ```
 
 Run a container from this image and that container should be removed after the run:
 
-```
 powershell
+```
 docker run -rm cypress-docker
 ```
 
 And the tests are now run inside container with cypress installed, we don't have cypress setup locally.
 
-```
-
-#SOME IMPORTANT POINTS:
+# SOME IMPORTANT POINTS:
 
 ## 1. npm install vs npm ci
 
@@ -154,9 +156,8 @@ npm ci is designed for continuous integration. It installs dependencies exactly 
 - Reads exact versions from package-lock.json and Installs exactly those versions
 - Fails if package-lock.json doesn’t match package.json
 
-```
 Example lockfile entry:
-
+```
 "react": {
   "version": "18.3.2",
   "resolved": "...",
@@ -220,5 +221,3 @@ npm run smoke
 
 Prevents accidental bypassing of automation
 Safer for CI and production pipelines
-
-``` 
