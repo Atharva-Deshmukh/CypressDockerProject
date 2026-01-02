@@ -813,11 +813,11 @@ Keeps:
 Tradeoff
 
 ```
-| GitHub-hosted | Self-hosted |
-|--------------|-------------|
-| Zero maintenance | You manage the machine |
-| Stateless | Stateful |
-| Slower builds | Much faster builds |
+| GitHub-hosted         | Self-hosted            |
+|-----------------------|------------------------|
+| Zero maintenance      | You manage the machine |
+| Stateless             | Stateful               |
+| Slower builds         | Much faster builds     |
 
 Rule of thumb
 
