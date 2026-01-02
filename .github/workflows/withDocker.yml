@@ -25,5 +25,8 @@ jobs:
             cypress-api-tests \
             npx cypress run --spec "cypress/e2e/api-int-secretPassed/*.cy.{js,ts}"
 
+    tags:
+      - DOCKER
+
 # Everything after the image name overrides the default command.
-# since this is cypress/included container, it runs by default on cypress run command, and this runs all the specs
+# Since this is a custom Docker image, the command after the image name will run only the specified spec(s).
