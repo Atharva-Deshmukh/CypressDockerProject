@@ -392,6 +392,162 @@ npm ci:
 
 ---
 
+# CONCEPT: Caching Strategies
+
+```
+In CI/CD, caching is about reusing expensive, repeatable work across pipeline runs or jobs.
+
+Typical expensive steps:
+
+- Downloading dependencies
+- Building artifacts
+- Installing browsers
+- Compiling code
+
+Caching avoids doing this from scratch every time.
+```
+
+## Industry-standard CI/CD caching strategies
+
+🔹 A. Dependency cache (MOST COMMON)
+
+```
+What is cached -> npm / yarn / pip / maven dependency downloads
+
+Why -> Dependencies change infrequently and Downloading them every run is slow
+
+Examples:
+
+ - ~/.npm
+ -  ~/.cache/yarn
+ - ~/.m2
+ - ~/.gradle
+
+Tools:
+
+- GitHub Actions cache
+- GitLab cache
+
+```
+
+🔹 B. Build artifact cache
+
+```
+What is cached?
+
+- Compiled outputs
+- Bundles
+- Dist folders
+
+Why -> Rebuilding is expensive
+
+Example -> Frontend build outputs reused by test jobs
+
+⚠️ Risky if artifacts depend on environment or secrets.
+```
+
+🔹 C. Docker layer cache
+
+```
+What is cached -> Docker build layers
+
+Why -> Docker builds are slow without cache
+
+How?
+
+- Copy lock files first
+- Install deps in early layers
+
+```
+---
+## Caching techniques I used in this Project
+
+```
+| Workflows Followed    | Caching technique used                      |
+|-----------------------|---------------------------------------------|
+| WITHOUT Docker YAML   | Dependency cache (package manager cache)    |
+| WITH Docker YAML      | Docker layer cache (implicit)               |
+
+```
+
+---
+## Mental Model of my Project Scenarios
+```
+WITHOUT DOCKER:
+CI Runner
+ ├── npm cache  (cached)              --> Cache location: CI Runner
+ ├── node_modules (recreated)
+ └── tests
+
+WITH DOCKER:
+Docker daemon
+ ├── base image
+ ├── deps layer (cached)              --> Cache location: Docker Daemon
+ ├── app layer
+ └── container run
+
+```
+
+1️⃣ Cache Used during Run WITHOUT Docker
+```
+YAML snippet
+  
+  - name: Setup Node.js (with npm cache)
+    uses: actions/setup-node@v4
+    with:
+      node-version: 20
+      cache: 'npm'
+  
+
+This is called -> Dependency cache (package-manager cache)
+
+What is cached -> ~/.npm (downloaded package tarballs)
+
+What is NOT cached?
+
+- node_modules
+- build artifacts
+- test results
+
+Why this works?
+
+- npm ci still runs every time
+- Downloads are reused
+- Install is fast and deterministic
+
+
+This is Common in -> GitHub Actions, GitLab CI, Jenkins
+```
+
+2️⃣ Cache Used during Run WITH Docker
+
+```
+Dockerfile pattern
+  COPY package.json yarn.lock ./
+  RUN yarn install --frozen-lockfile
+  COPY . .
+
+This is called -> Docker layer caching
+
+What is cached -> Docker image layers. Specifically The layer that installs dependencies
+
+When cache is reused?
+
+If:
+
+- package.json unchanged
+- yarn.lock unchanged
+- When cache is invalidated
+- If either file changes
+- Docker re-runs yarn install
+
+This happens:
+
+- During docker build
+- Not during docker run
+```
+---
+
 # Secrets management
 
 Instead of hardcoding base URLs, passwords, we store those variables in github secrets and then
