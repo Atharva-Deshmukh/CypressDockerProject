@@ -685,3 +685,143 @@ Just a yaml file change needed.
 ```
 REFER -> .github\workflows\withDocker.yml
 ```
+
+---
+
+# Some must know questions and their answers
+
+### How ENTRYPOINT affects docker run image <cmd>
+
+There are two important rules:
+
+Rule 1: CMD is replaceable, ENTRYPOINT is not (by default)
+
+Given:
+
+```
+ENTRYPOINT ["cypress", "run"]
+CMD ["--browser", "chrome"]
+```
+
+Then:
+```
+docker run image
+```
+
+Executes:
+```
+cypress run --browser chrome
+```
+
+But:
+```
+docker run image --browser firefox
+```
+
+Executes:
+```
+cypress run --browser firefox
+```
+
+➡️ Your <cmd> appends to ENTRYPOINT, it does not replace it.
+
+Rule 2: Overriding ENTRYPOINT requires an explicit flag
+
+```
+docker run --entrypoint sh image
+```
+
+Now ENTRYPOINT is gone, and you get:
+
+```
+sh
+```
+This is not accidental — Docker is protecting the image’s intended behavior.
+
+### When overriding ENTRYPOINT is actually useful?
+
+Overriding ENTRYPOINT is not an anti-pattern — it’s a debugging and CI escape hatch.
+
+Debugging CI failures
+
+```
+docker run -it --entrypoint sh cypress/included:13.6.0
+```
+
+
+Lets you:
+
+- Inspect filesystem
+- Verify binaries
+- Check env vars
+
+### Why Docker builds in CI often don’t reuse cache
+
+Docker cache only exists where the daemon exists
+
+Cache lives in:
+
+- /var/lib/docker
+- Inside the machine running Docker
+
+In CI, machines are often:
+
+- Ephemeral
+- Destroyed after each job
+
+So there is nothing to reuse.
+
+### Local Docker cache vs GitHub-hosted runner cache
+
+Local Docker cache
+
+- Persistent
+- Layer-based
+- Very fast
+- Automatically reused
+
+GitHub-hosted runners
+
+- Brand new VM every job
+- Empty Docker cache
+- No prior layers
+- Cache dies at job end
+
+So this happens every time:
+
+Step 1/12 : FROM node:18
+→ Pulling from docker.io/library/node
+
+Even if you ran it 10 minutes ago.
+
+### Why self-hosted runners matter
+
+Self-hosted runners:
+
+- Reuse the same Docker daemon
+
+```
+Keeps:
+
+- Image layers
+- Build cache
+- Node modules
+- Browser installs
+
+```
+
+Tradeoff
+
+```
+| GitHub-hosted | Self-hosted |
+|--------------|-------------|
+| Zero maintenance | You manage the machine |
+| Stateless | Stateful |
+| Slower builds | Much faster builds |
+
+Rule of thumb
+
+- Small projects → GitHub-hosted  
+- Heavy Docker / Cypress / Playwright → Self-hosted
+
+```
